@@ -14,6 +14,8 @@
 
 ## 本地部署
 
+请先部署后端代码，再部署web ui，具体流程参考back分支README与main分支实验报告。
+
 1. 安装nodejs
 2. 安装npm
 3. 安装react
