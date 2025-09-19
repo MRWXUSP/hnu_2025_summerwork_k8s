@@ -3,7 +3,6 @@ import {
   Folder, 
   File, 
   ChevronRight, 
-  ChevronDown, 
   RefreshCw, 
   ArrowLeft, 
   Download, 
@@ -27,8 +26,7 @@ const FileBrowser = ({ isOpen, onClose, nodeIp, nodePort = '30081' }) => {
   
   // 分页相关状态
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(100); // 每页显示100个文件
-  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage] = useState(100); // 每页显示100个文件
   const [totalPages, setTotalPages] = useState(1);
 
   // 获取文件列表
@@ -74,8 +72,8 @@ const FileBrowser = ({ isOpen, onClose, nodeIp, nodePort = '30081' }) => {
           window.URL.revokeObjectURL(downloadUrl);
           document.body.removeChild(a);
           
-          // 返回上一级目录
-          goBack();
+          // 下载完成后刷新当前目录列表，避免依赖 goBack 造成hook依赖警告
+          await fetchFiles(currentPath);
           return;
         } catch (error) {
           console.error('下载文件失败:', error);
@@ -108,8 +106,7 @@ const FileBrowser = ({ isOpen, onClose, nodeIp, nodePort = '30081' }) => {
           return a.localeCompare(b);
         });
         
-        // 更新总项目数和总页数
-        setTotalItems(sortedFiles.length);
+        // 更新总页数
         setTotalPages(Math.ceil(sortedFiles.length / itemsPerPage));
         
         // 重置为第一页
@@ -131,7 +128,7 @@ const FileBrowser = ({ isOpen, onClose, nodeIp, nodePort = '30081' }) => {
     } finally {
       setLoading(false);
     }
-  }, [nodeIp, customPort]);
+  }, [nodeIp, customPort, currentPath, itemsPerPage]);
 
   // 当端口变化时更新customPort
   useEffect(() => {

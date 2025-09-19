@@ -7,8 +7,6 @@ import {
   AlertCircle,
   X,
   Save,
-  Play,
-  Pause,
   Info
 } from 'lucide-react';
 

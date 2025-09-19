@@ -794,6 +794,37 @@ const NodeDetailModal = ({ node, onClose }) => {
     }
   };
 
+  // 清空工作区
+  const handleClearWorkspace = async () => {
+    if (!ip || !port) {
+      alert('请先填写IP与端口');
+      return;
+    }
+    if (!window.confirm('确认清空该节点的工作区？此操作不可恢复！')) {
+      return;
+    }
+    try {
+      const res = await fetch('/clear-workspace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip, port: Number(port) })
+      });
+      const result = await res.json();
+      if (result.status === 'success') {
+        alert('工作区已清空');
+        // 清空后刷新列表（根目录）
+        setPath('');
+        setFiles([]);
+        // 可选：尝试重新拉取当前路径
+        // await handleListFiles();
+      } else {
+        alert(`清空失败: ${result.http_status || ''} ${result.error || ''}`);
+      }
+    } catch (e) {
+      alert('清空失败: ' + e.message);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
@@ -911,6 +942,14 @@ const NodeDetailModal = ({ node, onClose }) => {
                 >
                   <Download className="w-4 h-4 mr-1" />
                   下载文件夹
+                </Button>
+                <Button 
+                  variant="danger" 
+                  size="sm"
+                  onClick={handleClearWorkspace}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  清空工作区
                 </Button>
               </div>
             </CardHeader>

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Folder, 
   File, 
-  Download, 
   X,
   AlertCircle,
   Check,

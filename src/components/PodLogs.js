@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   X, 
   RefreshCw,
   Download,
-  ChevronDown,
-  ChevronUp,
   Copy
 } from 'lucide-react';
 
@@ -19,7 +17,7 @@ const PodLogs = ({ isOpen, onClose, podName, namespace }) => {
   const [refreshInterval, setRefreshInterval] = useState(5000);
 
   // 获取Pod日志
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     if (!podName || !namespace) return;
     
     setLoading(true);
@@ -45,10 +43,10 @@ const PodLogs = ({ isOpen, onClose, podName, namespace }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [podName, namespace, container, tailLines]);
 
   // 获取Pod详情以获取容器列表
-  const fetchPodDetails = async () => {
+  const fetchPodDetails = useCallback(async () => {
     if (!podName || !namespace) return;
     
     try {
@@ -67,7 +65,7 @@ const PodLogs = ({ isOpen, onClose, podName, namespace }) => {
     } catch (error) {
       console.error('获取Pod详情失败:', error);
     }
-  };
+  }, [podName, namespace]);
 
   // 复制日志到剪贴板
   const copyLogs = () => {
@@ -98,7 +96,7 @@ const PodLogs = ({ isOpen, onClose, podName, namespace }) => {
       fetchPodDetails();
       fetchLogs();
     }
-  }, [isOpen, podName, namespace]);
+  }, [isOpen, podName, namespace, fetchLogs, fetchPodDetails]);
 
   // 处理自动刷新
   useEffect(() => {
@@ -113,7 +111,7 @@ const PodLogs = ({ isOpen, onClose, podName, namespace }) => {
         clearInterval(intervalId);
       }
     };
-  }, [autoRefresh, refreshInterval, isOpen, podName, namespace, container, tailLines]);
+  }, [autoRefresh, refreshInterval, isOpen, fetchLogs]);
 
   if (!isOpen) return null;
 

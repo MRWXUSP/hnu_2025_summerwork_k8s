@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Database, 
   Upload, 
   RefreshCw, 
-  Download,
-  Trash2,
   Search,
   Filter
 } from 'lucide-react';
