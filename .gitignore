@@ -1,0 +1,10 @@
+mnist_jpg.zip
+test.zip
+webui/__pycache__
+webui/react_k8s
+MNIST/mnist_jpg
+MNIST/predict_files.zip
+MNIST/train_files.zip
+.vscode
+webui/start_api.sh
+webui/start_react.sh

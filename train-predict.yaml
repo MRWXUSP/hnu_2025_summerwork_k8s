@@ -1,0 +1,89 @@
+# ========================
+# 训练节点（worker1）
+# ========================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mnist-train
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mnist-train
+  template:
+    metadata:
+      labels:
+        app: mnist-train
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: dl-cluster-worker     # 绑定到 worker1
+      containers:
+        - name: train-container
+          image: myenv-image:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace/data   # 存放训练资源
+      volumes:
+        - name: workspace
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mnist-train-service
+spec:
+  selector:
+    app: mnist-train
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30081   # worker1 节点暴露端口
+---
+# ========================
+# 预测节点（worker2）
+# ========================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mnist-predict
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mnist-predict
+  template:
+    metadata:
+      labels:
+        app: mnist-predict
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: dl-cluster-worker2   # 绑定到 worker2
+      containers:
+        - name: predict-container
+          image: myenv-image:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace/data   # 存放预测模型和上传图片
+      volumes:
+        - name: workspace
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mnist-predict-service
+spec:
+  selector:
+    app: mnist-predict
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30082   # worker2 节点暴露端口

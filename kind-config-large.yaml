@@ -1,0 +1,46 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            "runtime-config": "api/all=true"
+    extraPortMappings:
+      - containerPort: 30000
+        hostPort: 30000
+    # 限制 master 节点资源
+    kubeadmConfigPatchesJSON6902:
+      - group: kubeadm.k8s.io
+        version: v1beta3
+        kind: InitConfiguration
+        patch: |
+          [
+            {"op": "add", "path": "/nodeRegistration/kubeletExtraArgs/system-reserved", "value": "cpu=2000m,memory=2Gi"}
+          ]
+  - role: worker
+    extraMounts:
+      - hostPath: /mnt/data
+        containerPath: /data
+    kubeadmConfigPatchesJSON6902:
+      - group: kubeadm.k8s.io
+        version: v1beta3
+        kind: JoinConfiguration
+        patch: |
+          [
+            {"op": "add", "path": "/nodeRegistration/kubeletExtraArgs/system-reserved", "value": "cpu=3000m,memory=6Gi"}
+          ]
+  - role: worker
+    extraMounts:
+      - hostPath: /mnt/data
+        containerPath: /data
+    kubeadmConfigPatchesJSON6902:
+      - group: kubeadm.k8s.io
+        version: v1beta3
+        kind: JoinConfiguration
+        patch: |
+          [
+            {"op": "add", "path": "/nodeRegistration/kubeletExtraArgs/system-reserved", "value": "cpu=3000m,memory=6Gi"}
+          ]

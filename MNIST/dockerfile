@@ -1,0 +1,17 @@
+# 选择官方 PyTorch CUDA 镜像作为基础镜像
+FROM pytorch/pytorch:latest
+
+# 设置工作目录
+WORKDIR /workspace
+
+# 复制 requirements.txt 到容器
+COPY requirements.txt .
+
+# 安装 Python 依赖
+RUN pip install -r requirements.txt
+
+# 可选：复制你的代码到容器
+COPY main.py .
+
+# 默认启动命令（可根据需要修改）
+CMD ["bash", "-c", "python ./main.py; exec bash"]

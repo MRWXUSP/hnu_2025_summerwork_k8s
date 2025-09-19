@@ -1,0 +1,8 @@
+pillow
+tqdm
+torch
+torchvision
+fastapi
+uvicorn
+psutil
+python-multipart
